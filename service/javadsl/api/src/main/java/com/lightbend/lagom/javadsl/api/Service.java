@@ -465,6 +465,7 @@ public interface Service {
         new MethodRefMessageSerializer<>(),
         new MethodRefMessageSerializer<>(),
         Optional.empty(),
+        Optional.empty(),
         Optional.empty());
   }
 

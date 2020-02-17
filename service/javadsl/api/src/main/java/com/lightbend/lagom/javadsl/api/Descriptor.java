@@ -52,12 +52,14 @@ public final class Descriptor {
             MessageSerializers.NOT_USED,
             MessageSerializers.NOT_USED,
             Optional.empty(),
+            Optional.empty(),
             Optional.empty());
 
     private final CallId callId;
     private final ServiceCallHolder serviceCallHolder;
     private final MessageSerializer<Request, ?> requestSerializer;
     private final MessageSerializer<Response, ?> responseSerializer;
+    private final Optional<ExceptionSerializer> exceptionSerializer;
     private final Optional<CircuitBreaker> circuitBreaker;
     private final Optional<Boolean> autoAcl;
 
@@ -66,6 +68,7 @@ public final class Descriptor {
         ServiceCallHolder serviceCallHolder,
         MessageSerializer<Request, ?> requestSerializer,
         MessageSerializer<Response, ?> responseSerializer,
+        Optional<ExceptionSerializer> exceptionSerializer,
         Optional<CircuitBreaker> circuitBreaker,
         Optional<Boolean> autoAcl) {
 
@@ -73,6 +76,7 @@ public final class Descriptor {
       this.serviceCallHolder = serviceCallHolder;
       this.requestSerializer = requestSerializer;
       this.responseSerializer = responseSerializer;
+      this.exceptionSerializer = exceptionSerializer;
       this.circuitBreaker = circuitBreaker;
       this.autoAcl = autoAcl;
     }
@@ -116,6 +120,15 @@ public final class Descriptor {
     }
 
     /**
+     * Get the exception serializer.
+     *
+     * @return The exception serializer, if configured.
+     */
+    public Optional<ExceptionSerializer> exceptionSerializer() {
+      return exceptionSerializer;
+    }
+
+    /**
      * Get the circuit breaker.
      *
      * @return The circuit breaker, if configured.
@@ -147,6 +160,7 @@ public final class Descriptor {
           serviceCallHolder,
           requestSerializer,
           responseSerializer,
+          exceptionSerializer,
           circuitBreaker,
           autoAcl);
     }
@@ -163,6 +177,7 @@ public final class Descriptor {
           serviceCallHolder,
           requestSerializer,
           responseSerializer,
+          exceptionSerializer,
           circuitBreaker,
           autoAcl);
     }
@@ -180,6 +195,7 @@ public final class Descriptor {
           serviceCallHolder,
           requestSerializer,
           responseSerializer,
+          exceptionSerializer,
           circuitBreaker,
           autoAcl);
     }
@@ -197,6 +213,25 @@ public final class Descriptor {
           serviceCallHolder,
           requestSerializer,
           responseSerializer,
+          exceptionSerializer,
+          circuitBreaker,
+          autoAcl);
+    }
+
+    /**
+     * Return a copy of this call descriptor with the given exception serializer configured.
+     *
+     * @param exceptionSerializer The exception serializer.
+     * @return A copy of this call descriptor.
+     */
+    public Call<Request, Response> withExceptionSerializer(
+        ExceptionSerializer exceptionSerializer) {
+      return new Call<>(
+          callId,
+          serviceCallHolder,
+          requestSerializer,
+          responseSerializer,
+          Optional.of(exceptionSerializer),
           circuitBreaker,
           autoAcl);
     }
@@ -213,6 +248,7 @@ public final class Descriptor {
           serviceCallHolder,
           requestSerializer,
           responseSerializer,
+          exceptionSerializer,
           Optional.of(circuitBreaker),
           autoAcl);
     }
@@ -230,6 +266,7 @@ public final class Descriptor {
           serviceCallHolder,
           requestSerializer,
           responseSerializer,
+          exceptionSerializer,
           circuitBreaker,
           Optional.of(autoAcl));
     }
@@ -260,6 +297,8 @@ public final class Descriptor {
           + requestSerializer
           + ", responseSerializer="
           + responseSerializer
+          + ", exceptionSerializer="
+          + exceptionSerializer
           + ", circuitBreaker="
           + circuitBreaker
           + ", autoAcl="

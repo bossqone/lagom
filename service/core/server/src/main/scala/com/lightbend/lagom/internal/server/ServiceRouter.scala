@@ -182,12 +182,12 @@ private[lagom] abstract class ServiceRouter(httpConfiguration: HttpConfiguration
         .recover {
           case NonFatal(e) =>
             logException(e, descriptor, call)
-            exceptionToResult(descriptor, filteredHeaders, e)
+            exceptionToResult(descriptor, call, filteredHeaders, e)
         }
     } catch {
       case NonFatal(e) =>
         logException(e, descriptor, call)
-        Accumulator.done(exceptionToResult(descriptor, filteredHeaders, e))
+        Accumulator.done(exceptionToResult(descriptor, call, filteredHeaders, e))
     }
   }
 
@@ -270,10 +270,15 @@ private[lagom] abstract class ServiceRouter(httpConfiguration: HttpConfiguration
   /**
    * Converts an exception to a result, using the configured exception serializer.
    */
-  private def exceptionToResult(descriptor: Descriptor, requestHeader: RequestHeader, e: Throwable): Result = {
+  private def exceptionToResult(
+      descriptor: Descriptor,
+      call: Call[_, _],
+      requestHeader: RequestHeader,
+      e: Throwable
+  ): Result = {
     val acceptedResponseProtocols = requestHeaderAcceptedResponseProtocols(requestHeader)
     val rawExceptionMessage =
-      exceptionSerializerSerialize(descriptorExceptionSerializer(descriptor), e, acceptedResponseProtocols)
+      exceptionSerializerSerialize(callExceptionSerializer(descriptor, call), e, acceptedResponseProtocols)
     val responseHeader = headerFilterTransformServerResponse(
       descriptorHeaderFilter(descriptor),
       rawExceptionMessageToResponseHeader(rawExceptionMessage),
@@ -475,7 +480,7 @@ private[lagom] abstract class ServiceRouter(httpConfiguration: HttpConfiguration
                 Try(ByteString(Base64.getDecoder.decode(reason))).toOption.getOrElse(ByteString(reason))
               }
               throw exceptionSerializerDeserializeWebSocketException(
-                descriptorExceptionSerializer(descriptor),
+                callExceptionSerializer(descriptor, call),
                 statusCode.get,
                 requestProtocol,
                 messageBytes
@@ -495,20 +500,24 @@ private[lagom] abstract class ServiceRouter(httpConfiguration: HttpConfiguration
               .recover {
                 case NonFatal(e) =>
                   logException(e, descriptor, call)
-                  exceptionToCloseMessage(e, acceptHeaders)
+                  exceptionToCloseMessage(call, e, acceptHeaders)
               }
           )
       )
     }.recover {
       case NonFatal(e) =>
         logException(e, descriptor, call)
-        Left(exceptionToResult(descriptor, requestHeader, e))
+        Left(exceptionToResult(descriptor, call, requestHeader, e))
     }
   }
 
   /** Convert an exception to a close message */
-  private def exceptionToCloseMessage(exception: Throwable, acceptHeaders: immutable.Seq[MessageProtocol]) = {
-    val exceptionSerializer = descriptorExceptionSerializer(descriptor)
+  private def exceptionToCloseMessage(
+      call: Call[_, _],
+      exception: Throwable,
+      acceptHeaders: immutable.Seq[MessageProtocol]
+  ) = {
+    val exceptionSerializer = callExceptionSerializer(descriptor, call)
     // First attempt to serialize the exception using the exception serializer
     val rawExceptionMessage = exceptionSerializerSerialize(exceptionSerializer, exception, acceptHeaders)
 

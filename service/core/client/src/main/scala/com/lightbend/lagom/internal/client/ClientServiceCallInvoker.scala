@@ -274,7 +274,7 @@ private[lagom] abstract class ClientServiceCallInvoker[Request, Response](
 
       if (response.status >= 400 && response.status <= 599) {
         throw exceptionSerializerDeserializeHttpException(
-          descriptorExceptionSerializer(descriptor),
+          callExceptionSerializer(descriptor, call),
           response.status,
           protocol,
           response.bodyAsBytes

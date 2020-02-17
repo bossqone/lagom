@@ -119,6 +119,7 @@ trait LagomServiceApiBridge {
   def methodForCall(call: Call[_, _]): Method
   def callRequestSerializer[Request, W](call: Call[Request, _]): MessageSerializer[Request, W]
   def callResponseSerializer[Response, W](call: Call[_, Response]): MessageSerializer[Response, W]
+  def callExceptionSerializer(descriptor: Descriptor, call: Call[_, _]): ExceptionSerializer
 
   type Method
   def methodName(m: Method): String
@@ -128,7 +129,6 @@ trait LagomServiceApiBridge {
   type Descriptor
   def descriptorHeaderFilter(d: Descriptor): HeaderFilter
   def descriptorName(d: Descriptor): String
-  def descriptorExceptionSerializer(d: Descriptor): ExceptionSerializer
 
   type HeaderFilter
   def headerFilterTransformClientRequest(hf: HeaderFilter, rh: RequestHeader): RequestHeader

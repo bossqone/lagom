@@ -126,6 +126,14 @@ object Descriptor {
     val responseSerializer: MessageSerializer[Response, _]
 
     /**
+     * The exception serializer.
+     *
+     * @return Some value if this service call wants to override the exception serializer configured for its service,
+     *         otherwise empty.
+     */
+    val exceptionSerializer: Option[ExceptionSerializer]
+
+    /**
      * The configured circuit breaker.
      *
      * @return Some value if this service call wants to override the circuit breaker configured for its service,
@@ -157,6 +165,13 @@ object Descriptor {
     def withResponseSerializer(responseSerializer: MessageSerializer[Response, _]): Call[Request, Response]
 
     /**
+     * Return a copy of this call with the given exception serializer configured.
+     *
+     * This will override the exception serializer configured on the service descriptor.
+     */
+    def withExceptionSerializer(exceptionSerializer: ExceptionSerializer): Call[Request, Response]
+
+    /**
      * Return a copy of this call with the given circuit breaker configured.
      *
      * This will override the circuit breaker configured on the service descriptor.
@@ -176,6 +191,7 @@ object Descriptor {
     new ServiceCallHolder {},
     MessageSerializer.NotUsedMessageSerializer,
     MessageSerializer.NotUsedMessageSerializer,
+    None,
     None,
     None
   )
@@ -374,6 +390,7 @@ object Descriptor {
       serviceCallHolder: ServiceCallHolder,
       requestSerializer: MessageSerializer[Request, _],
       responseSerializer: MessageSerializer[Response, _],
+      exceptionSerializer: Option[ExceptionSerializer] = None,
       circuitBreaker: Option[CircuitBreaker] = None,
       autoAcl: Option[Boolean] = None
   ) extends Call[Request, Response] {
@@ -383,6 +400,8 @@ object Descriptor {
       copy(requestSerializer = requestSerializer)
     override def withResponseSerializer(responseSerializer: MessageSerializer[Response, _]): Call[Request, Response] =
       copy(responseSerializer = responseSerializer)
+    override def withExceptionSerializer(exceptionSerializer: ExceptionSerializer): Call[Request, Response] =
+      copy(exceptionSerializer = Some(exceptionSerializer))
     override def withCircuitBreaker(circuitBreaker: CircuitBreaker): Call[Request, Response] =
       copy(circuitBreaker = Some(circuitBreaker))
     override def withAutoAcl(autoAcl: Boolean): Call[Request, Response] = copy(autoAcl = Some(autoAcl))

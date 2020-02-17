@@ -153,6 +153,8 @@ trait ScaladslServiceApiBridge extends LagomServiceApiBridge {
     call.requestSerializer.asInstanceOf[MessageSerializer[Request, W]]
   override def callResponseSerializer[Response, W](call: Call[_, Response]): MessageSerializer[Response, W] =
     call.responseSerializer.asInstanceOf[MessageSerializer[Response, W]]
+  override def callExceptionSerializer(descriptor: Descriptor, call: Call[_, _]): ExceptionSerializer =
+    call.exceptionSerializer.getOrElse(descriptor.exceptionSerializer)
 
   override type Method = transport.Method
   override def methodName(m: Method): String   = m.name
@@ -161,9 +163,8 @@ trait ScaladslServiceApiBridge extends LagomServiceApiBridge {
   override type CallId = api.Descriptor.CallId
 
   override type Descriptor = api.Descriptor
-  override def descriptorHeaderFilter(d: Descriptor): HeaderFilter               = d.headerFilter
-  override def descriptorName(d: Descriptor): String                             = d.name
-  override def descriptorExceptionSerializer(d: Descriptor): ExceptionSerializer = d.exceptionSerializer
+  override def descriptorHeaderFilter(d: Descriptor): HeaderFilter = d.headerFilter
+  override def descriptorName(d: Descriptor): String               = d.name
 
   // Exceptions
   override def newPayloadTooLarge(msg: String): Throwable = transport.PayloadTooLarge(msg)

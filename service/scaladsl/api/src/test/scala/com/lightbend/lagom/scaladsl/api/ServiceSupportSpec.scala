@@ -18,7 +18,7 @@ class ServiceSupportSpec extends WordSpec with Matchers with OptionValues {
       val holder = new StringMockService {
         override def foo(bar: String): ServiceCall[String, String] = null
       }.descriptor.calls.collect {
-        case CallImpl(PathCallIdImpl("/foo/:bar"), holder: ServiceSupport.ScalaMethodServiceCall[_, _], _, _, _, _) =>
+        case CallImpl(PathCallIdImpl("/foo/:bar"), holder: ServiceSupport.ScalaMethodServiceCall[_, _], _, _, _, _, _) =>
           holder
       }.headOption
 
@@ -36,7 +36,7 @@ class ServiceSupportSpec extends WordSpec with Matchers with OptionValues {
       val holder = new DoubleMockService {
         override def foo(bar: Double): ServiceCall[String, String] = null
       }.descriptor.calls.collect {
-        case CallImpl(PathCallIdImpl("/foo/:bar"), holder: ServiceSupport.ScalaMethodServiceCall[_, _], _, _, _, _) =>
+        case CallImpl(PathCallIdImpl("/foo/:bar"), holder: ServiceSupport.ScalaMethodServiceCall[_, _], _, _, _, _, _) =>
           holder
       }.headOption
 
@@ -50,7 +50,7 @@ class ServiceSupportSpec extends WordSpec with Matchers with OptionValues {
       val holder = new VectorStringMockService {
         override def foo(bar: Vector[String]): ServiceCall[String, String] = null
       }.descriptor.calls.collect {
-        case CallImpl(PathCallIdImpl("/foo?bar"), holder: ServiceSupport.ScalaMethodServiceCall[_, _], _, _, _, _) =>
+        case CallImpl(PathCallIdImpl("/foo?bar"), holder: ServiceSupport.ScalaMethodServiceCall[_, _], _, _, _, _, _) =>
           holder
       }.headOption
 
@@ -64,7 +64,7 @@ class ServiceSupportSpec extends WordSpec with Matchers with OptionValues {
       val holder = new ListDoubleMockService {
         override def foo(bar: List[Double]): ServiceCall[String, String] = null
       }.descriptor.calls.collect {
-        case CallImpl(PathCallIdImpl("/foo?bar"), holder: ServiceSupport.ScalaMethodServiceCall[_, _], _, _, _, _) =>
+        case CallImpl(PathCallIdImpl("/foo?bar"), holder: ServiceSupport.ScalaMethodServiceCall[_, _], _, _, _, _, _) =>
           holder
       }.headOption
 
